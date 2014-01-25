@@ -20,3 +20,6 @@
 .settings
 .cproject
 .project
+
+#WinMerge-Backups
+*.bak

@@ -29,7 +29,6 @@
 // EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
 //
-
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -290,11 +289,10 @@ void ble_rsp_attributes_read_type(const struct ble_msg_attributes_read_type_rsp_
 
 void ble_rsp_connection_disconnect(const struct ble_msg_connection_disconnect_rsp_t *msg) {
 	printf("[<] ble_rsp_connection_disconnect\n");
-	if (msg->result == 0) {
-		clearFlag(app_state, APP_COMMAND_PENDING);
-	} else {
+	if (msg->result != 0) {
 		setFlag(app_state, APP_COMMAND_ERROR);
 	}
+	clearFlag(app_state, APP_COMMAND_PENDING);
 }
 
 void ble_rsp_connection_get_rssi(const struct ble_msg_connection_get_rssi_rsp_t *msg) {
@@ -325,56 +323,50 @@ void ble_rsp_connection_raw_tx(const struct ble_msg_connection_raw_tx_rsp_t *msg
 
 void ble_rsp_attclient_find_by_type_value(const struct ble_msg_attclient_find_by_type_value_rsp_t *msg) {
 	printf("[<] ble_rsp_attclient_find_by_type_value, connection: %d\n", msg->connection);
-	if (msg->result == 0) {
-		clearFlag(app_state, APP_COMMAND_PENDING);
-	} else {
+	if (msg->result != 0) {
 		setFlag(app_state, APP_COMMAND_ERROR);
 	}
+	clearFlag(app_state, APP_COMMAND_PENDING);
 }
 
 void ble_rsp_attclient_read_by_group_type(const struct ble_msg_attclient_read_by_group_type_rsp_t *msg) {
 	printf("[<] ble_rsp_attclient_read_by_group_type, connection: %d\n", msg->connection);
-	if (msg->result == 0) {
-		clearFlag(app_state, APP_COMMAND_PENDING);
-	} else {
+	if (msg->result != 0) {
 		setFlag(app_state, APP_COMMAND_ERROR);
 	}
+	clearFlag(app_state, APP_COMMAND_PENDING);
 }
 
 void ble_rsp_attclient_read_by_type(const struct ble_msg_attclient_read_by_type_rsp_t *msg) {
 	printf("[<] ble_rsp_attclient_read_by_type, result: 0x%04X\n", msg->result);
-	if (msg->result == 0) {
-		clearFlag(app_state, APP_COMMAND_PENDING);
-	} else {
+	if (msg->result != 0) {
 		setFlag(app_state, APP_COMMAND_ERROR);
 	}
+	clearFlag(app_state, APP_COMMAND_PENDING);
 }
 
 void ble_rsp_attclient_find_information(const struct ble_msg_attclient_find_information_rsp_t *msg) {
 	printf("[<] ble_rsp_attclient_find_information, result: 0x%04X\n", msg->result);
-	if (msg->result == 0) {
-		clearFlag(app_state, APP_COMMAND_PENDING);
-	} else {
+	if (msg->result != 0) {
 		setFlag(app_state, APP_COMMAND_ERROR);
 	}
+	clearFlag(app_state, APP_COMMAND_PENDING);
 }
 
 void ble_rsp_attclient_read_by_handle(const struct ble_msg_attclient_read_by_handle_rsp_t *msg) {
 	printf("[<] ble_rsp_attclient_read_by_handle, result: 0x%04X\n", msg->result);
-	if (msg->result == 0) {
-		clearFlag(app_state, APP_COMMAND_PENDING);
-	} else {
+	if (msg->result != 0) {
 		setFlag(app_state, APP_COMMAND_ERROR);
 	}
+	clearFlag(app_state, APP_COMMAND_PENDING);
 }
 
 void ble_rsp_attclient_attribute_write(const struct ble_msg_attclient_attribute_write_rsp_t *msg) {
 	printf("[<] ble_rsp_attclient_attribute_write, result: %d\n", msg->result);
-	if (msg->result == 0) {
-		clearFlag(app_state, APP_COMMAND_PENDING);
-	} else {
+	if (msg->result != 0) {
 		setFlag(app_state, APP_COMMAND_ERROR);
 	}
+	clearFlag(app_state, APP_COMMAND_PENDING);
 }
 
 void ble_rsp_sm_encrypt_start(const struct ble_msg_sm_encrypt_start_rsp_t *msg) {
@@ -394,26 +386,26 @@ void ble_rsp_gap_set_mode(const struct ble_msg_gap_set_mode_rsp_t *msg) {
 
 void ble_rsp_gap_discover(const struct ble_msg_gap_discover_rsp_t *msg) {
 	printf("[<] ble_rsp_gap_discover\n");
-	if (msg->result == 0) {
-		clearFlag(app_state, APP_COMMAND_PENDING);
-	} else {
+	if (msg->result != 0) {
 		setFlag(app_state, APP_COMMAND_ERROR);
 	}
+	clearFlag(app_state, APP_COMMAND_PENDING);
 }
 
 void ble_rsp_gap_connect_direct(const struct ble_msg_gap_connect_direct_rsp_t *msg) {
 	printf("[<] ble_rsp_gap_connect_direct, result: %d\n", msg->result);
-	if (msg->result == 0) {
-		clearFlag(app_state, APP_COMMAND_PENDING);
-	} else {
+	if (msg->result != 0) {
 		setFlag(app_state, APP_COMMAND_ERROR);
 	}
+	clearFlag(app_state, APP_COMMAND_PENDING);
 }
 
 void ble_rsp_gap_end_procedure(const struct ble_msg_gap_end_procedure_rsp_t *msg) {
 	printf("[<] ble_rsp_gap_end_procedure, result: 0x%04X\n", msg->result);
+	if (msg->result != 0) {
+		setFlag(app_state, APP_COMMAND_ERROR);
+	}
 	clearFlag(app_state, APP_COMMAND_PENDING);
-
 }
 
 void ble_rsp_hardware_io_port_config_irq(const struct ble_msg_hardware_io_port_config_irq_rsp_t *msg) {
@@ -498,11 +490,10 @@ void ble_evt_attclient_indicated(const struct ble_msg_attclient_indicated_evt_t 
 
 void ble_evt_attclient_procedure_completed(const struct ble_msg_attclient_procedure_completed_evt_t *msg) {
 	printf("[<] ble_evt_attclient_procedure_completed, handle: 0x%04X, result: 0x%04X\n", msg->chrhandle, msg->result);
-	clearFlag(app_state, APP_ATTCLIENT_PENDING);
-
 	if (msg->result != 0) {
 		setFlag(app_state, APP_ATTCLIENT_ERROR);
 	}
+	clearFlag(app_state, APP_ATTCLIENT_PENDING);
 }
 
 void ble_evt_attclient_group_found(const struct ble_msg_attclient_group_found_evt_t *msg) {
@@ -510,7 +501,7 @@ void ble_evt_attclient_group_found(const struct ble_msg_attclient_group_found_ev
 	printf("\tStart handle: 0x%04x\n", msg->start);
 	printf("\tEnd handle: 0x%04x\n", msg->end);
 	printf("\tUUID (Hex): ");
-	printUUID((uint8 *)msg->uuid.data, msg->uuid.len);
+	printUUID((uint8 *) msg->uuid.data, msg->uuid.len);
 	printf("\n");
 }
 
@@ -522,7 +513,7 @@ void ble_evt_attclient_find_information_found(const struct ble_msg_attclient_fin
 	printf("\tConn: 0x%02x\n", msg->connection);
 	printf("\tCharacteristic Handle: 0x%04x\n", msg->chrhandle);
 	printf("\tUUID (Hex): ");
-	printUUID((uint8 *)msg->uuid.data, msg->uuid.len);
+	printUUID((uint8 *) msg->uuid.data, msg->uuid.len);
 	printf("\n");
 }
 
@@ -532,7 +523,7 @@ void ble_evt_attclient_attribute_value(const struct ble_msg_attclient_attribute_
 	printf("\tHandle: 0x%04x\n", msg->atthandle);
 	printf("\tType: 0x%02x\n", msg->type);
 	printf("\tValue (Hex):\n");
-	printHexdump((uint8 *)msg->value.data, msg->value.len, 10);
+	printHexdump((uint8 *) msg->value.data, msg->value.len, 10);
 	printf("\n");
 	memcpy(app_attclient.value.data, msg->value.data, msg->value.len * sizeof(uint8));
 	app_attclient.value.len = msg->value.len;
@@ -554,7 +545,7 @@ void ble_evt_sm_smp_data(const struct ble_msg_sm_smp_data_evt_t *msg) {
 void ble_evt_gap_scan_response(const struct ble_msg_gap_scan_response_evt_t *msg) {
 	printf("[<] ble_evt_gap_scan_response\n");
 	printf("\tScan response from: ");
-	printAddr6((uint8 *)msg->sender.addr, ':');
+	printAddr6((uint8 *) msg->sender.addr, ':');
 	printf("\n");
 	printf("\t%d\n", msg->rssi);
 }

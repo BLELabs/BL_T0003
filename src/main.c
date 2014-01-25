@@ -35,6 +35,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <conio.h>
 #include <stdlib.h>
 #include <windows.h>
 
@@ -134,13 +135,16 @@ int main(int argc, char *argv[]) {
 	app_attclient.state = 0;
 	app_state = 0;
 
-	/* stop previous operation */
-	printf("[>] ble_cmd_gap_end_procedure\n");
-	ble_cmd_gap_end_procedure();
+	/* BLE system reset */
+	printf("[>] ble_cmd_system_reset\n");
+	ble_cmd_system_reset(0); //Reboot normal program
 	if (wait_for_rsp() != APP_OK) {
 		die();
 	}
-	/* No need to wait for an event here */
+	/* No response & no event here */
+
+	/* But wait a second until device boots up */
+	Sleep(1000);
 
 	/* get connection status,current command will be handled in response */
 	printf("[>] ble_cmd_connection_get_status\n");
@@ -158,7 +162,9 @@ int main(int argc, char *argv[]) {
 	if (wait_for_rsp() != APP_OK) {
 		die();
 	}
-	wait_for_evt();
+	if (wait_for_evt() != APP_OK) {
+		die();
+	}
 
 	/* Are we connected? */
 	if (app_connection.state != APP_DEVICE_CONNECTED) {
@@ -177,7 +183,9 @@ int main(int argc, char *argv[]) {
 	if (wait_for_rsp() != APP_OK) {
 		die();
 	}
-	wait_for_evt();
+	if (wait_for_evt() != APP_OK) {
+		die();
+	}
 
 	/* Give me all primary services within the whole handle range */
 	/* Hint: With handle start and handle end groups can be separated */
@@ -188,7 +196,9 @@ int main(int argc, char *argv[]) {
 	if (wait_for_rsp() != APP_OK) {
 		die();
 	}
-	wait_for_evt();
+	if (wait_for_evt() != APP_OK) {
+		die();
+	}
 
 	/* Now lets get us some values with an UUID i.e. the device name */
 	uint8 devicename_uuid[] = GATT_DEVICENAME_UUID;
@@ -202,7 +212,9 @@ int main(int argc, char *argv[]) {
 	if (wait_for_rsp() != APP_OK) {
 		die();
 	}
-	wait_for_evt();
+	if (wait_for_evt() != APP_OK) {
+		die();
+	}
 
 	/* If we got a value back print it, it must be our targets device name */
 	int i = 0;
@@ -221,7 +233,7 @@ int main(int argc, char *argv[]) {
 
 	/* Write a value with a handle */
 	uint8 bgdemo_handle = 20;
-	uint8 bgdemo_value[] = {0x12,0x34,0x56};
+	uint8 bgdemo_value[] = { 0x12, 0x34, 0x56 };
 	uint8 bgdemo_value_len = sizeof(bgdemo_value);
 
 	printf("[###]Write a value by handle[###]\n");
@@ -230,10 +242,12 @@ int main(int argc, char *argv[]) {
 	if (wait_for_rsp() != APP_OK) {
 		die();
 	}
-	wait_for_evt();
+	if (wait_for_evt() != APP_OK) {
+		die();
+	}
 
 	/* Read value with 128-bit UUID */
-	uint8 bgdemo_char_uuid[16] = {0};
+	uint8 bgdemo_char_uuid[16] = { 0 };
 	uint8 bgdemo_char_uuid_len = sizeof(bgdemo_char_uuid);
 	/* String representation of uuid */
 	char str_uuid[] = "f1b41cde-dbf5-4acf-8679-ecb8b4dca6fe";
@@ -249,7 +263,9 @@ int main(int argc, char *argv[]) {
 	if (wait_for_rsp() != APP_OK) {
 		die();
 	}
-	wait_for_evt();
+	if (wait_for_evt() != APP_OK) {
+		die();
+	}
 
 	/* If we got a value back print it, it must be our 0xDEADBEEF */
 	if (!issetFlag(app_state, APP_ATTCLIENT_ERROR)) {
@@ -323,8 +339,8 @@ int main(int argc, char *argv[]) {
 	}
 	wait_for_evt();
 
-	/* Loop until the end of time */
-	while (1)
+	printf("\n<<< Press any key to end the program. >>>\n");
+	while (!kbhit())
 		;
 
 	exit(0);
@@ -338,6 +354,9 @@ int8 wait_for_rsp() {
 			return APP_FAILURE;
 		}
 	}
+	if (issetFlag(app_state, APP_COMMAND_ERROR)) {
+		return APP_FAILURE;
+	}
 	return APP_OK;
 }
 
@@ -349,6 +368,10 @@ int8 wait_for_evt() {
 			return APP_FAILURE;
 		}
 	}
+	if (issetFlag(app_state, APP_ATTCLIENT_ERROR)) {
+		return APP_FAILURE;
+	}
+
 	return APP_OK;
 }
 
@@ -396,7 +419,9 @@ int read_message() {
 }
 
 inline void die() {
-	printf("Failure. End of program...\n");
+	printf("\n<<< An unexpected error occurred. Compare result code with error codes from BGAPI manual - chapter 'Error Codes'. Press any key to end the program. >>>\n");
+	while (!kbhit())
+		;
 	exit(-1);
 }
 
